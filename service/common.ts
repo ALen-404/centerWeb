@@ -40,7 +40,7 @@ import type { SystemFeatures } from '@/types/feature'
 
 type LoginSuccess = {
   result: 'success'
-  data: { access_token: string;refresh_token: string }
+  data: { access_token: string; refresh_token: string }
 }
 type LoginFail = {
   result: 'fail'
@@ -330,11 +330,11 @@ export const fetchRemoteFileInfo = (url: string) => {
 export const sendEMailLoginCode = (email: string, language = 'en-US') =>
   post<CommonResponse & { data: string }>('/email-code-login', { body: { email, language } })
 
-export const emailLoginWithCode = (data: { email: string;code: string;token: string }) =>
+export const emailLoginWithCode = (data: { email: string; code: string; token: string }) =>
   post<LoginResponse>('/email-code-login/validity', { body: data })
 
 export const sendResetPasswordCode = (email: string, language = 'en-US') =>
-  post<CommonResponse & { data: string;message?: string ;code?: string }>('/forgot-password', { body: { email, language } })
+  post<CommonResponse & { data: string; message?: string; code?: string }>('/forgot-password', { body: { email, language } })
 
-export const verifyResetPasswordCode = (body: { email: string;code: string;token: string }) =>
+export const verifyResetPasswordCode = (body: { email: string; code: string; token: string }) =>
   post<CommonResponse & { is_valid: boolean }>('/forgot-password/validity', { body })

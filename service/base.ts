@@ -1,4 +1,4 @@
-import { API_PREFIX, IS_CE_EDITION, PUBLIC_API_PREFIX } from '@/config'
+import { API_PREFIX, HAJIME_USER_PREFIX, IS_CE_EDITION, PUBLIC_API_PREFIX } from '@/config'
 import Toast from '@/app/components/base/toast'
 import type { AnnotationReply, MessageEnd, MessageReplace, ThoughtItem } from '@/app/components/base/chat/chat/type'
 import type { VisionFile } from '@/types/app'
@@ -36,6 +36,24 @@ const baseOptions = {
   }),
   redirect: 'follow',
 }
+
+const HAJIME_USER_PATHS = [
+  '/login',
+];
+
+const determineUrlPrefix = (url: string, isPublicAPI: boolean): string => {
+  // 优先检查 url 是否匹配 HAJIME_USER_PATHS 中的路径
+  if (HAJIME_USER_PATHS.includes(url)) {
+    return HAJIME_USER_PREFIX;
+  }
+
+  // 如果不是公共 API，则使用默认的 API_PREFIX
+  if (isPublicAPI) {
+    return PUBLIC_API_PREFIX;
+  }
+
+  return API_PREFIX;
+};
 
 export type IOnDataMoreInfo = {
   conversationId?: string
@@ -319,7 +337,7 @@ const baseFetch = <T>(
       options.headers.set('Content-Type', ContentType.json)
   }
 
-  const urlPrefix = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX
+  const urlPrefix = determineUrlPrefix(url, isPublicAPI)
   let urlWithPrefix = `${urlPrefix}${url.startsWith('/') ? url : `/${url}`}`
 
   const { method, params, body } = options
