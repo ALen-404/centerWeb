@@ -101,10 +101,10 @@ export default function AppSelector({ isMobile }: IAppSelector) {
                       </div>
                     </div>
                   </Menu.Item>
-                  <div className='px-1 py-1'>
+                  {/* <div className='px-1 py-1'>
                     <div className='mt-2 px-3 text-xs font-medium text-gray-500'>{t('common.userProfile.workspace')}</div>
                     <WorkplaceSelector />
-                  </div>
+                  </div> */}
                   <div className="px-1 py-1">
                     <Menu.Item>
                       <Link
@@ -120,7 +120,7 @@ export default function AppSelector({ isMobile }: IAppSelector) {
                         <div>{t('common.userProfile.settings')}</div>
                       </div>
                     </Menu.Item>
-                    {canEmailSupport && <Menu.Item>
+                    {/* {canEmailSupport && <Menu.Item>
                       <a
                         className={classNames(itemClassName, 'group justify-between')}
                         href={mailToSupport(userProfile.email, plan.type, langeniusVersionInfo.current_version)}
@@ -179,7 +179,7 @@ export default function AppSelector({ isMobile }: IAppSelector) {
                           </div>
                         </Menu.Item>
                       )
-                    }
+                    } */}
                   </div>
                   <Menu.Item>
                     <div className='p-1' onClick={() => handleLogout()}>
