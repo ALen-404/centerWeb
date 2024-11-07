@@ -1,5 +1,7 @@
-const { codeInspectorPlugin } = require('code-inspector-plugin')
-const withMDX = require('@next/mdx')({
+/* eslint-disable */
+
+const { codeInspectorPlugin } = require("code-inspector-plugin");
+const withMDX = require("@next/mdx")({
   extension: /\.mdx?$/,
   options: {
     // If you use remark-gfm, you'll need to use next.config.mjs
@@ -10,25 +12,36 @@ const withMDX = require('@next/mdx')({
     // If you use `MDXProvider`, uncomment the following line.
     // providerImportSource: "@mdx-js/react",
   },
-})
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { dev, isServer }) => {
-    config.plugins.push(codeInspectorPlugin({ bundler: 'webpack' }))
-    return config
+    config.plugins.push(codeInspectorPlugin({ bundler: "webpack" }));
+    return config;
   },
   productionBrowserSourceMaps: false, // enable browser source map generation during the production build
   // Configure pageExtensions to include md and mdx
-  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-  experimental: {
-  },
+  pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
+  experimental: {},
   // fix all before production. Now it slow the develop speed.
   eslint: {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
-    dirs: ['app', 'bin', 'config', 'context', 'hooks', 'i18n', 'models', 'service', 'test', 'types', 'utils'],
+    dirs: [
+      "app",
+      "bin",
+      "config",
+      "context",
+      "hooks",
+      "i18n",
+      "models",
+      "service",
+      "test",
+      "types",
+      "utils",
+    ],
   },
   typescript: {
     // https://nextjs.org/docs/api-reference/next.config.js/ignoring-typescript-errors
@@ -38,13 +51,21 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/',
-        destination: '/apps',
+        source: "/",
+        destination: "/apps",
         permanent: false,
       },
-    ]
+    ];
   },
-  output: 'standalone',
-}
+  async rewrites() {
+    return [
+      {
+        source: "/dify/:path*", // 匹配所有以 /api/ 开头的请求
+        destination: "http://localhost:8001/dify/:path*", // 将请求代理到这个目标地址
+      },
+    ];
+  },
+  output: "standalone",
+};
 
-module.exports = withMDX(nextConfig)
+module.exports = withMDX(nextConfig);
