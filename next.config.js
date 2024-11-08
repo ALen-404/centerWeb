@@ -63,6 +63,10 @@ const nextConfig = {
         source: "/dify/:path*", // 匹配所有以 /api/ 开头的请求
         destination: "http://localhost:8001/dify/:path*", // 将请求代理到这个目标地址
       },
+      {
+        source: "/hajime/:path*", // 匹配所有以 /api/ 开头的请求
+        destination: "http://localhost:8000/:path*", // 将请求代理到这个目标地址
+      },
     ];
   },
   output: "standalone",
