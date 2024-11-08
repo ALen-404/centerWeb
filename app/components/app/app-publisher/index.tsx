@@ -36,6 +36,7 @@ export type AppPublisherProps = {
   multipleModelConfigs?: ModelAndParameter[]
   /** modelAndParameter is passed when debugWithMultipleModel is true */
   onPublish?: (modelAndParameter?: ModelAndParameter) => Promise<any> | any
+  onPushPublic?: (modelAndParameter?: ModelAndParameter) => Promise<any> | any
   onRestore?: () => Promise<any> | any
   onToggle?: (state: boolean) => void
   crossAxisOffset?: number
@@ -52,6 +53,7 @@ const AppPublisher = ({
   debugWithMultipleModel = false,
   multipleModelConfigs = [],
   onPublish,
+  onPushPublic,
   onRestore,
   onToggle,
   crossAxisOffset = 0,
@@ -73,8 +75,20 @@ const AppPublisher = ({
   }, [language])
 
   const handlePublish = async (modelAndParameter?: ModelAndParameter) => {
+    console.log(modelAndParameter,'modelAndParameter');
+
     try {
       await onPublish?.(modelAndParameter)
+      setPublished(true)
+    }
+    catch (e) {
+      setPublished(false)
+    }
+  }
+  const handlePublicPush = async (modelAndParameter?: ModelAndParameter) => {
+    
+    try {
+      await onPushPublic?.(modelAndParameter)
       setPublished(true)
     }
     catch (e) {
@@ -170,16 +184,34 @@ const AppPublisher = ({
                   variant='primary'
                   className='w-full mt-3'
                   onClick={() => handlePublish()}
-                  disabled={publishDisabled || published}
                 >
-                  {
-                    published
-                      ? t('workflow.common.published')
-                      : publishedAt ? t('workflow.common.update') : t('workflow.common.publish')
-                  }
+                 {t('workflow.common.update') }
                 </Button>
               )
             }
+
+            {debugWithMultipleModel
+              ? (
+               
+                <PublishWithMultipleModel
+                  multipleModelConfigs={multipleModelConfigs}
+                  onSelect={item => handlePublish(item)}
+                  />
+              )
+              : (
+                <Button
+                  variant='primary'
+                  className='w-full mt-3'
+                  onClick={() => handlePublicPush()}
+                >
+                  {
+                    t('workflow.common.publish')
+                  }
+            </Button>
+              )
+            }
+            
+             
           </div>
           <div className='p-4 pt-3 border-t-[0.5px] border-t-black/5'>
             <SuggestedAction disabled={!publishedAt} link={appURL} icon={<PlayCircle />}>{t('workflow.common.runApp')}</SuggestedAction>

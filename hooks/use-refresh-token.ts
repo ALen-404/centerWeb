@@ -30,16 +30,17 @@ const useRefreshToken = () => {
     localStorage?.removeItem('is_refreshing')
     localStorage?.removeItem('console_token')
     localStorage?.removeItem('refresh_token')
-    router.replace('/signin')
   }, [])
 
   const getNewAccessToken = useCallback(async () => {
     const currentAccessToken = localStorage?.getItem('console_token')
     const currentRefreshToken = localStorage?.getItem('refresh_token')
+    
     if (!currentAccessToken || !currentRefreshToken) {
-      handleError()
-      return new Error('No access token or refresh token found')
+      console.warn('No access token or refresh token found. Proceeding without authentication.')
+      return null 
     }
+    
     if (localStorage?.getItem('is_refreshing') === '1') {
       clearTimeout(timer.current)
       timer.current = setTimeout(() => {
@@ -47,16 +48,19 @@ const useRefreshToken = () => {
       }, 1000)
       return null
     }
+    
     const currentTokenExpireTime = getExpireTime(currentAccessToken)
     if (getCurrentTimeStamp() + advanceTime.current > currentTokenExpireTime) {
       localStorage?.setItem('is_refreshing', '1')
       const [e, res] = await fetchWithRetry(fetchNewToken({
         body: { refresh_token: currentRefreshToken },
       }) as Promise<CommonResponse & { data: { access_token: string; refresh_token: string } }>)
+      
       if (e) {
         handleError()
         return e
       }
+      
       const { access_token, refresh_token } = res.data
       localStorage?.setItem('is_refreshing', '0')
       localStorage?.setItem('console_token', access_token)
@@ -66,8 +70,7 @@ const useRefreshToken = () => {
       timer.current = setTimeout(() => {
         getNewAccessToken()
       }, newTokenExpireTime - advanceTime.current - getCurrentTimeStamp())
-    }
-    else {
+    } else {
       const newTokenExpireTime = getExpireTime(currentAccessToken)
       clearTimeout(timer.current)
       timer.current = setTimeout(() => {
@@ -80,7 +83,7 @@ const useRefreshToken = () => {
   const handleVisibilityChange = useCallback(() => {
     if (document.visibilityState === 'visible')
       getNewAccessToken()
-  }, [])
+  }, [getNewAccessToken])
 
   useEffect(() => {
     window.addEventListener('visibilitychange', handleVisibilityChange)
@@ -89,7 +92,7 @@ const useRefreshToken = () => {
       clearTimeout(timer.current)
       localStorage?.removeItem('is_refreshing')
     }
-  }, [])
+  }, [handleVisibilityChange])
 
   return {
     getNewAccessToken,

@@ -13,7 +13,7 @@ import ExploreContext from '@/context/explore-context'
 import type { App } from '@/models/explore'
 import Category from '@/app/components/explore/category'
 import AppCard from '@/app/components/explore/app-card'
-import { fetchAppDetail, fetchAppList } from '@/service/explore'
+import { fetchAppDetail, fetchAppList, fetchNoAuthAppList } from '@/service/explore'
 import { importApp } from '@/service/apps'
 import { useTabSearchParams } from '@/hooks/use-tab-searchparams'
 import CreateAppModal from '@/app/components/explore/create-app-modal'
@@ -68,7 +68,7 @@ const Apps = ({
   } = useSWR(
     ['/explore/apps'],
     () =>
-      fetchAppList().then(({ categories, recommended_apps }) => ({
+      fetchNoAuthAppList().then(({ categories, recommended_apps }) => ({
         categories,
         allList: recommended_apps.sort((a, b) => a.position - b.position),
       })),
@@ -81,6 +81,7 @@ const Apps = ({
   )
 
   const filteredList = useMemo(() => {
+    
     if (currCategory === allCategoriesEn) {
       if (!currentType)
         return allList
@@ -104,8 +105,12 @@ const Apps = ({
   }, [currentType, currCategory, allCategoriesEn, allList])
 
   const searchFilteredList = useMemo(() => {
-    if (!searchKeywords || !filteredList || filteredList.length === 0)
+    if (!searchKeywords || !filteredList || filteredList.length === 0){
+      console.log(filteredList,'filteredList');
+      
       return filteredList
+
+    }
 
     const lowerCaseSearchKeywords = searchKeywords.toLowerCase()
 
@@ -150,7 +155,7 @@ const Apps = ({
     }
   }
 
-  if (!categories || categories.length === 0) {
+  if (!categories || categories.length !== 0) {
     return (
       <div className="flex h-full items-center">
         <Loading type="area" />

@@ -73,7 +73,7 @@ const Header = () => {
       {!isMobile && (
         <div className='flex items-center'>
           {!isCurrentWorkspaceDatasetOperator && <ExploreNav className={navClassName} />}
-          {!isCurrentWorkspaceDatasetOperator && <AppNav />}
+          {(isCurrentWorkspaceEditor || isCurrentWorkspaceDatasetOperator) && <AppNav />}
           {(isCurrentWorkspaceEditor || isCurrentWorkspaceDatasetOperator) && <DatasetNav />}
           {!isCurrentWorkspaceDatasetOperator && <ToolsNav className={navClassName} />}
         </div>
@@ -85,6 +85,7 @@ const Header = () => {
             <HeaderBillingBtn onClick={handlePlanClick} />
           </div>
         )}
+       
         <WorkspaceProvider>
           <AccountDropdown isMobile={isMobile} />
         </WorkspaceProvider>
@@ -92,7 +93,7 @@ const Header = () => {
       {(isMobile && isShowNavMenu) && (
         <div className='w-full flex flex-col p-2 gap-y-1'>
           {!isCurrentWorkspaceDatasetOperator && <ExploreNav className={navClassName} />}
-          {!isCurrentWorkspaceDatasetOperator && <AppNav />}
+          {(isCurrentWorkspaceEditor || isCurrentWorkspaceDatasetOperator) && <AppNav />}
           {(isCurrentWorkspaceEditor || isCurrentWorkspaceDatasetOperator) && <DatasetNav />}
           {!isCurrentWorkspaceDatasetOperator && <ToolsNav className={navClassName} />}
         </div>

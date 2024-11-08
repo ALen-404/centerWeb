@@ -8,6 +8,13 @@ export const fetchAppList = () => {
   }>('/explore/apps')
 }
 
+export const fetchNoAuthAppList = () => {
+  return get<{
+    categories: AppCategory[]
+    recommended_apps: App[]
+  }>('/apps/no_auth')
+}
+
 export const fetchAppDetail = (id: string): Promise<any> => {
   return get(`/explore/apps/${id}`)
 }

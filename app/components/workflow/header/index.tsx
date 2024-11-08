@@ -109,9 +109,27 @@ const Header: FC = () => {
   }, [handleSyncWorkflowDraft, workflowStore])
 
   const onPublish = useCallback(async () => {
+    console.log('这里调用了onPublish',handleCheckBeforePublish());
+    
     if (handleCheckBeforePublish()) {
       const res = await publishWorkflow(`/apps/${appID}/workflows/publish`)
 
+      if (res) {
+        notify({ type: 'success', message: t('common.api.actionSuccess') })
+        workflowStore.getState().setPublishedAt(res.created_at)
+      }
+    }
+    else {
+      throw new Error('Checklist failed')
+    }
+  }, [appID, handleCheckBeforePublish, notify, t, workflowStore])
+
+  const onPushPublic = useCallback(async () => {
+    console.log(123123);
+    
+    if (handleCheckBeforePublish()) {
+      const res = await publishWorkflow(`/dify/console/api/apps/publish/${appID}`)
+      
       if (res) {
         notify({ type: 'success', message: t('common.api.actionSuccess') })
         workflowStore.getState().setPublishedAt(res.created_at)
@@ -186,6 +204,7 @@ const Header: FC = () => {
                 inputs: variables,
                 onRefreshData: handleToolConfigureUpdate,
                 onPublish,
+                onPushPublic,
                 onRestore: onStartRestoring,
                 onToggle: onPublisherToggle,
                 crossAxisOffset: 4,

@@ -102,6 +102,7 @@ export type AppTokenCostsResponse = {
 }
 
 export type UpdateAppModelConfigResponse = { result: string }
+export type publicAppResponse = { result: string }
 
 export type ApiKeyItemResponse = {
   id: string

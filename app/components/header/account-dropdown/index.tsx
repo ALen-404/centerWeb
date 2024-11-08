@@ -21,6 +21,7 @@ import { useModalContext } from '@/context/modal-context'
 import { LanguagesSupported } from '@/i18n/language'
 import { useProviderContext } from '@/context/provider-context'
 import { Plan } from '@/app/components/billing/type'
+import Button from '../../base/button'
 
 export type IAppSelector = {
   isMobile: boolean
@@ -55,7 +56,10 @@ export default function AppSelector({ isMobile }: IAppSelector) {
 
   return (
     <div className="">
-      <Menu as="div" className="relative inline-block text-left">
+      {
+        userProfile?
+        <>
+        <Menu as="div" className="relative inline-block text-left">
         {
           ({ open }) => (
             <>
@@ -200,6 +204,17 @@ export default function AppSelector({ isMobile }: IAppSelector) {
       {
         aboutVisible && <AccountAbout onCancel={() => setAboutVisible(false)} langeniusVersionInfo={langeniusVersionInfo} />
       }
+        </>
+        :<Button
+        tabIndex={2}
+        variant='primary'
+        onClick={()=>{
+          router.replace('/signin')
+        }}
+        className="w-full"
+      >{t('login.signBtn')}</Button>
+      }
+      
     </div >
   )
 }

@@ -41,7 +41,7 @@ import Debug from '@/app/components/app/configuration/debug'
 import Confirm from '@/app/components/base/confirm'
 import { ModelFeatureEnum, ModelTypeEnum } from '@/app/components/header/account-setting/model-provider-page/declarations'
 import { ToastContext } from '@/app/components/base/toast'
-import { fetchAppDetail, updateAppModelConfig } from '@/service/apps'
+import { fetchAppDetail, publicApp, updateAppModelConfig } from '@/service/apps'
 import { promptVariablesToUserInputsForm, userInputsFormToPromptVariables } from '@/utils/model-config'
 import { fetchDatasets } from '@/service/datasets'
 import { useProviderContext } from '@/context/provider-context'
@@ -754,6 +754,18 @@ const Configuration: FC = () => {
     return true
   }
 
+  const onPushPublic = async (modelAndParameter?: ModelAndParameter, features?: FeaturesData) => {
+   
+
+   const data =  await publicApp({ url: `/apps/publish/${appId}` })
+   console.log(data,'data');
+   
+  
+    notify({ type: 'success', message: t('common.api.success') })
+
+    return true
+  }
+
   const [showUseGPT4Confirm, setShowUseGPT4Confirm] = useState(false)
 
   const {
@@ -914,6 +926,7 @@ const Configuration: FC = () => {
                       debugWithMultipleModel,
                       multipleModelConfigs,
                       onPublish,
+                      onPushPublic,
                       publishedConfig: publishedConfig!,
                       resetAppConfig: () => syncToPublishedConfig(publishedConfig!),
                     }} />

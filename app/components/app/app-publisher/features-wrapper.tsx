@@ -13,6 +13,7 @@ import { SupportUploadFileTypes } from '@/app/components/workflow/types'
 
 type Props = Omit<AppPublisherProps, 'onPublish'> & {
   onPublish?: (modelAndParameter?: ModelAndParameter, features?: any) => Promise<any> | any
+  onPushPublic?: (modelAndParameter?: ModelAndParameter, features?: any) => Promise<any> | any
   publishedConfig?: any
   resetAppConfig?: () => void
 }
@@ -60,14 +61,21 @@ const FeaturesWrappedAppPublisher = (props: Props) => {
   }, [featuresStore, props])
 
   const handlePublish = useCallback((modelAndParameter?: ModelAndParameter) => {
+    console.log(modelAndParameter,'modelAndParameter');
+    
     return props.onPublish?.(modelAndParameter, features)
   }, [features, props])
+  const handlePushPublic = useCallback((modelAndParameter?: ModelAndParameter) => {
+    return props.onPushPublic?.(modelAndParameter, features)
+  }, [features, props])
+  
 
   return (
     <>
       <AppPublisher {...{
         ...props,
         onPublish: handlePublish,
+        onPushPublic: handlePushPublic,
         onRestore: () => setRestoreConfirmOpen(true),
       }}/>
       {restoreConfirmOpen && (

@@ -20,7 +20,7 @@ export type AppContextValue = {
   apps: App[]
   systemFeatures: SystemFeatures
   mutateApps: VoidFunction
-  userProfile: UserProfileResponse
+  userProfile?: UserProfileResponse // Made optional
   mutateUserProfile: VoidFunction
   currentWorkspace: ICurrentWorkspace
   isCurrentWorkspaceManager: boolean
@@ -60,13 +60,7 @@ const AppContext = createContext<AppContextValue>({
   setTheme: () => { },
   apps: [],
   mutateApps: () => { },
-  userProfile: {
-    id: '',
-    name: '',
-    email: '',
-    avatar: '',
-    is_password_set: false,
-  },
+  userProfile: undefined, // Initial state set to undefined
   currentWorkspace: initialWorkspaceInfo,
   isCurrentWorkspaceManager: false,
   isCurrentWorkspaceOwner: false,
@@ -90,21 +84,25 @@ export type AppContextProviderProps = {
 export const AppContextProvider: FC<AppContextProviderProps> = ({ children }) => {
   const pageContainerRef = useRef<HTMLDivElement>(null)
 
-  const { data: appList, mutate: mutateApps } = useSWR({ url: '/apps', params: { page: 1, limit: 30, name: '' } }, fetchAppList)
+  // Choose the API endpoint based on user profile response availability
   const { data: userProfileResponse, mutate: mutateUserProfile } = useSWR({ url: '/account/profile', params: {} }, fetchUserProfile)
+  const appListEndpoint = userProfileResponse ? '/apps' : '/apps/no_auth'
+  const { data: appList, mutate: mutateApps } = useSWR({ url: appListEndpoint, params: { page: 1, limit: 30, name: '' } }, fetchAppList)
+
   const { data: currentWorkspaceResponse, mutate: mutateCurrentWorkspace } = useSWR({ url: '/workspaces/current', params: {} }, fetchCurrentWorkspace)
 
   const { data: systemFeatures } = useSWR({ url: '/console/system-features' }, getSystemFeatures, {
     fallbackData: defaultSystemFeatures,
   })
 
-  const [userProfile, setUserProfile] = useState<UserProfileResponse>()
+  const [userProfile, setUserProfile] = useState<UserProfileResponse | undefined>()
   const [langeniusVersionInfo, setLangeniusVersionInfo] = useState<LangGeniusVersionResponse>(initialLangeniusVersionInfo)
   const [currentWorkspace, setCurrentWorkspace] = useState<ICurrentWorkspace>(initialWorkspaceInfo)
   const isCurrentWorkspaceManager = useMemo(() => ['owner', 'admin'].includes(currentWorkspace.role), [currentWorkspace.role])
   const isCurrentWorkspaceOwner = useMemo(() => currentWorkspace.role === 'owner', [currentWorkspace.role])
   const isCurrentWorkspaceEditor = useMemo(() => ['owner', 'admin', 'editor'].includes(currentWorkspace.role), [currentWorkspace.role])
   const isCurrentWorkspaceDatasetOperator = useMemo(() => currentWorkspace.role === 'dataset_operator', [currentWorkspace.role])
+  
   const updateUserProfileAndVersion = useCallback(async () => {
     if (userProfileResponse && !userProfileResponse.bodyUsed) {
       const result = await userProfileResponse.json()
@@ -117,7 +115,11 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({ children }) =>
   }, [userProfileResponse])
 
   useEffect(() => {
-    updateUserProfileAndVersion()
+    if (userProfileResponse) {
+      updateUserProfileAndVersion()
+    } else {
+      setUserProfile(undefined) // Set userProfile to undefined if not logged in
+    }
   }, [updateUserProfileAndVersion, userProfileResponse])
 
   useEffect(() => {
@@ -136,7 +138,7 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({ children }) =>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (!appList || !userProfile)
+  if (!appList)
     return <Loading type='app' />
 
   return (
